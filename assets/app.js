@@ -9,7 +9,8 @@ import './styles/app.css';
 import './bootstrap';
 import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
-import CustomerPage from './pages/CustomersPage';
+import CustomersPage from './pages/CustomersPage';
+import InvoicesPage from './pages/InvoicesPage';
 
 const App = () => {
     return (
@@ -18,7 +19,8 @@ const App = () => {
 
             <main className='container pt-5'>
                 <Switch>
-                    <Route path="/customers" component={CustomerPage} />
+                    <Route path="/customers" component={CustomersPage} />
+                    <Route path="/invoices" component={InvoicesPage} />
                     <Route path="/" component={HomePage} />
                 </Switch>
             </main>
