@@ -88,7 +88,7 @@ const InvoicesPage = (props) => {
             <thead>
                 <tr>
                     <th>Numéro</th>
-                    <th>CLient</th>
+                    <th>Client</th>
                     <th>Date d'envoi</th>
                     <th>Statut</th>
                     <th>Montant</th>

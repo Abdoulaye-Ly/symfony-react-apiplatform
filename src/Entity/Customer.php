@@ -7,10 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
+
 
 /**
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
@@ -35,18 +39,26 @@ class Customer
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank(message="Le prénom est obligatoire")
+     * @Assert\Length(min=3, minMessage="Le prénom doit être compris entre 3 et 255 caractères", 
+     * max=255, maxMessage="Le prénom doit être compris entre 3 et 255 caractères")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank(message="Le nom est obligatoire")
+     * @Assert\Length(min=3, minMessage="Le nom doit être compris entre 3 et 255 caractères", 
+     * max=255, maxMessage="Le  nom doit être compris entre 3 et 255 caractères")
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank(message="Le prénom est obligatoire")
+     * @Assert\Email(message="L'email n'est pas valide")
      */
     private $email;
 
@@ -59,18 +71,48 @@ class Customer
     /**
      * @ORM\OneToMany(targetEntity=Invoice::class, mappedBy="customer")
      *  @Groups({"customers_read"})
+     * @Assert\NotBlank(message="L'utilisateur est obligatoire")
+     *  
      */
     private $invoices;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="customers")
-     * @Groups({"customers_read", "invoices_read"})
+     * @Groups({"customers_read"})
+     * @ApiSubresource
      */
     private $user;
 
     public function __construct()
     {
         $this->invoices = new ArrayCollection();
+    }
+
+    /**
+     * Récuperer le total des factures
+     * @Groups({"customers_read"})
+     * @return float
+     */
+
+    public function getTotalAmount(): int
+    {
+        return array_reduce($this->invoices->toArray(), function ($total, $invoice) {
+            return $total + $invoice->getAmount();
+        }, 0);
+    }
+
+    /**
+     * Récupérer le montant total des factures non payé
+     * @Groups({"customers_read"})
+     * @return float
+     */
+
+    public function getUnpaidAmount(): float
+    {
+        return array_reduce($this->invoices->toArray(), function ($total, $invoice) {
+            return $total + ($invoice->getStatus() === "PAID" || $invoice->getStatus() === "CANCELLED" ? 0 : 
+            $invoice->getAmount());
+        }, 0);
     }
 
     public function getId(): ?int
