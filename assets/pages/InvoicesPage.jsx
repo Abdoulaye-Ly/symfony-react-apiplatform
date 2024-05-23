@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Pagination from "../components/Pagination";
 import axios from "axios";
 import InvoicesAPI from "../services/invoicesAPI";
+import moment from "moment";
 
 const STATUS_CLASSES = {
     PAID: "success",
@@ -15,7 +16,6 @@ const STATUS_LABELS = {
     CANCELLED: "Annulée"
 
 };
-
 
 const InvoicesPage = (props) => {
 
@@ -76,6 +76,8 @@ const InvoicesPage = (props) => {
     itemsPerPage
   );
 
+  const formatDate = (str) => moment(str).format('DD/MM/YYYY');
+
     return (
         <>
         <h1>Listes des factures</h1>
@@ -84,7 +86,7 @@ const InvoicesPage = (props) => {
             <input type="text" onChange={handleSearch} value={search} className="form-control" placeholder="Rechercher..." />
         </div>
 
-        <table className="table table-hover">
+        <table className="table">
             <thead>
                 <tr>
                     <th>Numéro</th>
@@ -100,11 +102,10 @@ const InvoicesPage = (props) => {
                 
                     <td>{invoice.chrono}</td>
                     <td>{invoice.customer.firstName} {invoice.customer.lastName}</td>
-                    <td>{invoice.sentAt}</td>
+                    <td>{formatDate(invoice.sentAt)}</td>
                     <td>
-                        <span className={"badge badge-" + STATUS_CLASSES[invoices.status]}
-                        >
-                            {STATUS_LABELS[invoice.status]}</span>
+                        <span className={"badge bg-" + STATUS_CLASSES[invoice.status]}>
+                        {STATUS_LABELS[invoice.status]}</span>
                     </td>
                     <td>{invoice.amount}</td>
                     <td>
